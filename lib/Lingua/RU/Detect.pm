@@ -1,9 +1,10 @@
 package Lingua::RU::Detect;
 
 use vars qw ($VERSION);
-$VERSION = '1.0';
+$VERSION = '1.1';
 
 use strict;
+use utf8;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -48,13 +49,6 @@ my %patterns = (
 	'UTF-8.CP866,ISO-8859-5.UTF-8',			'[а-ор-я]+[╟╧╫╣║╔╙═╔╥╧╦┴╤╠┼╦╘╥╔╞╔╦┴├╔╤└╓╬┘╚ ╟╒┬┼╥╬╔╩]+[а-ор-я]+[╟╧╫╣║╔╙═╔╥╧╦┴╤╠┼╦╘╥╔╞╔╦┴├╔╤└╓╬┘╚ ╟╒┬┼╥╬╔╩]+',
 	'UTF-8.KOI8-R',							'[пя][╟╧╫╣║╔╙═╔╥╧╦┴╤╠┼╦╘╥╔╞╔╦┴├╔╤└╓╬┘╚ ╟╒┬┼╥╬╔╩][пя]|п.я',
 	'UTF-8.CP866',							'[▒▓╟╧╫╣║╔╙═╔╥╧╦┴╤╠┼╦╘╥╔╞╔╦┴├╔╤└╓╬┘╚ ╟╒┬┼╥╬╔╩]+[А-Я][▒▓╟╧╫╣║╔╙═╔╥╧╦┴╤╠┼╦╘╥╔╞╔╦┴├╔╤└╓╬┘╚ ╟╒┬┼╥╬╔╩]+[А-Я][▒▓╟╧╫╣║╔╙═╔╥╧╦┴╤╠┼╦╘╥╔╞╔╦┴├╔╤└╓╬┘╚ ╟╒┬┼╥╬╔╩]+',
-
-	'x-URL-encoded',						'%D0%[0-9a-fA-F]{2}',
-	'x-Quoted-printable',					'=[0-9a-fA-F]{2}',
-	'x-PerlUTF',							'x\{[0-9a-fA-F]+\}',
-
-	'x-IDN',								'\b[xX][nN]--[a-zA-Z0-9]+\b',
-	#'-',									'&#x?[0-9a-fA-F]{2,4};',
 );
 
 my %ambiguities = (
@@ -107,7 +101,7 @@ sub make_list {
 
 	for my $pair (split /,/, $path) {
 		my ($from, $to) = split /\./, $pair;
-		push @ret, [$from, $to];
+		push @ret, [$from, $to] unless $from eq '-';
 	}
 
 	return @ret;
@@ -151,9 +145,11 @@ The result of calling C<detect_enc> subroutine is a list of encoding pairs. To g
 		]
 	];
 
+If no reencoding is needed, result is an empty array.
+
 For test suite refer to Wikipedia page
 http://ru.wikipedia.org/wiki/%D0%9A%D1%80%D0%BE%D0%BA%D0%BE%D0%B7%D1%8F%D0%B1%D1%80%D1%8B
-(not all of them are passed in this 1.0 version).
+(not all of them pass current version).
 
 =head1 AUTHOR
 
@@ -161,7 +157,7 @@ Andrew Shitov, <andy@shitov.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-Lingua::RU::Numeric::Declension module is a free software. 
+Lingua::RU::Detect module is a free software. 
 You may redistribute and (or) modify it under the same terms as Perl 5.10.
 
 =cut
